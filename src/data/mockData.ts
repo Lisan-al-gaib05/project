@@ -1,115 +1,179 @@
-import { Course, Quiz, Badge, LeaderboardEntry } from '../types';
+import { Quiz, Badge, LeaderboardEntry, QuizAttempt } from '../types';
 
-export const mockCourses: Course[] = [
+export const mockQuizzes: Quiz[] = [
   {
     id: '1',
-    title: 'React Fundamentals',
-    description: 'Master the basics of React including components, state, props, and lifecycle methods.',
-    category: 'Frontend Development',
+    title: 'JavaScript Fundamentals',
+    description: 'Test your knowledge of basic JavaScript concepts including variables, functions, and data types.',
+    category: 'Programming',
     difficulty: 'beginner',
-    duration: '6 weeks',
-    enrolledStudents: 1250,
-    rating: 4.8,
-    image: 'https://images.pexels.com/photos/11035380/pexels-photo-11035380.jpeg?auto=compress&cs=tinysrgb&w=800',
-    instructor: 'Sarah Chen',
-    modules: [
+    timeLimit: 900, // 15 minutes
+    passingScore: 70,
+    points: 100,
+    createdBy: 'admin',
+    createdAt: '2024-01-15',
+    attempts: 245,
+    averageScore: 78,
+    isActive: true,
+    questions: [
       {
         id: '1',
-        courseId: '1',
-        title: 'Introduction to React',
-        description: 'Learn what React is and why it\'s popular',
-        content: 'React is a JavaScript library for building user interfaces...',
-        duration: '45 minutes',
-        points: 100,
-        quizId: '1'
+        question: 'What is the correct way to declare a variable in JavaScript?',
+        type: 'multiple-choice',
+        options: ['var myVar = 5;', 'variable myVar = 5;', 'v myVar = 5;', 'declare myVar = 5;'],
+        correctAnswer: 0,
+        explanation: 'The "var" keyword is used to declare variables in JavaScript.',
+        points: 10
       },
       {
         id: '2',
-        courseId: '1',
-        title: 'Components and JSX',
-        description: 'Understanding React components and JSX syntax',
-        content: 'Components are the building blocks of React applications...',
-        duration: '60 minutes',
-        points: 150,
-        quizId: '2'
+        question: 'JavaScript is a case-sensitive language.',
+        type: 'true-false',
+        options: ['True', 'False'],
+        correctAnswer: 0,
+        explanation: 'JavaScript is indeed case-sensitive, meaning "myVar" and "myvar" are different variables.',
+        points: 10
+      },
+      {
+        id: '3',
+        question: 'Which of the following is NOT a JavaScript data type?',
+        type: 'multiple-choice',
+        options: ['String', 'Boolean', 'Integer', 'Undefined'],
+        correctAnswer: 2,
+        explanation: 'JavaScript has Number type, not specifically Integer. All numbers are of type Number.',
+        points: 15
+      },
+      {
+        id: '4',
+        question: 'What does "=== " operator do in JavaScript?',
+        type: 'multiple-choice',
+        options: ['Assignment', 'Equality check', 'Strict equality check', 'Not equal'],
+        correctAnswer: 2,
+        explanation: 'The "===" operator checks for strict equality, comparing both value and type.',
+        points: 15
+      },
+      {
+        id: '5',
+        question: 'Functions in JavaScript can return values.',
+        type: 'true-false',
+        options: ['True', 'False'],
+        correctAnswer: 0,
+        explanation: 'JavaScript functions can return values using the return statement.',
+        points: 10
       }
     ]
   },
   {
     id: '2',
-    title: 'JavaScript Advanced Concepts',
-    description: 'Deep dive into advanced JavaScript concepts including closures, prototypes, and async programming.',
-    category: 'Programming',
-    difficulty: 'advanced',
-    duration: '8 weeks',
-    enrolledStudents: 890,
-    rating: 4.9,
-    image: 'https://images.pexels.com/photos/4164418/pexels-photo-4164418.jpeg?auto=compress&cs=tinysrgb&w=800',
-    instructor: 'Mike Rodriguez',
-    modules: [
+    title: 'React Components & Props',
+    description: 'Advanced quiz covering React components, props, state management, and lifecycle methods.',
+    category: 'Frontend Development',
+    difficulty: 'intermediate',
+    timeLimit: 1200, // 20 minutes
+    passingScore: 75,
+    points: 150,
+    createdBy: 'admin',
+    createdAt: '2024-01-20',
+    attempts: 189,
+    averageScore: 82,
+    isActive: true,
+    questions: [
       {
-        id: '3',
-        courseId: '2',
-        title: 'Closures and Scope',
-        description: 'Understanding closures and lexical scope in JavaScript',
-        content: 'Closures are a fundamental concept in JavaScript...',
-        duration: '90 minutes',
-        points: 200,
-        quizId: '3'
+        id: '6',
+        question: 'What is JSX in React?',
+        type: 'multiple-choice',
+        options: ['A JavaScript extension', 'A CSS framework', 'A database query language', 'A testing library'],
+        correctAnswer: 0,
+        explanation: 'JSX is a JavaScript syntax extension that allows you to write HTML-like code in JavaScript.',
+        points: 15
+      },
+      {
+        id: '7',
+        question: 'Props in React are mutable.',
+        type: 'true-false',
+        options: ['True', 'False'],
+        correctAnswer: 1,
+        explanation: 'Props are immutable in React. They cannot be changed by the component that receives them.',
+        points: 20
+      },
+      {
+        id: '8',
+        question: 'Which hook is used for state management in functional components?',
+        type: 'multiple-choice',
+        options: ['useEffect', 'useState', 'useContext', 'useReducer'],
+        correctAnswer: 1,
+        explanation: 'useState is the primary hook for managing state in functional components.',
+        points: 20
       }
     ]
   },
   {
     id: '3',
-    title: 'Database Design Principles',
-    description: 'Learn how to design efficient and scalable database schemas.',
+    title: 'Database Design & SQL',
+    description: 'Comprehensive quiz on database design principles, normalization, and SQL queries.',
     category: 'Backend Development',
-    difficulty: 'intermediate',
-    duration: '5 weeks',
-    enrolledStudents: 675,
-    rating: 4.7,
-    image: 'https://images.pexels.com/photos/577585/pexels-photo-577585.jpeg?auto=compress&cs=tinysrgb&w=800',
-    instructor: 'Dr. Emily Watson',
-    modules: [
-      {
-        id: '4',
-        courseId: '3',
-        title: 'Entity Relationship Diagrams',
-        description: 'Creating and interpreting ER diagrams',
-        content: 'Entity Relationship Diagrams help visualize database structure...',
-        duration: '75 minutes',
-        points: 175,
-        quizId: '4'
-      }
-    ]
-  }
-];
-
-export const mockQuizzes: Quiz[] = [
-  {
-    id: '1',
-    moduleId: '1',
-    title: 'React Basics Quiz',
-    timeLimit: 600,
-    passingScore: 70,
+    difficulty: 'advanced',
+    timeLimit: 1800, // 30 minutes
+    passingScore: 80,
+    points: 200,
+    createdBy: 'admin',
+    createdAt: '2024-01-25',
+    attempts: 156,
+    averageScore: 75,
+    isActive: true,
     questions: [
       {
-        id: '1',
-        question: 'What is React?',
+        id: '9',
+        question: 'What is the primary key in a database table?',
         type: 'multiple-choice',
-        options: ['A JavaScript library', 'A database', 'A web server', 'A CSS framework'],
+        options: ['A unique identifier for each row', 'The first column in a table', 'A foreign key reference', 'An index on the table'],
         correctAnswer: 0,
-        explanation: 'React is a JavaScript library for building user interfaces.',
+        explanation: 'A primary key uniquely identifies each row in a database table.',
         points: 25
       },
       {
-        id: '2',
-        question: 'React components must return a single element.',
+        id: '10',
+        question: 'Normalization helps reduce data redundancy.',
         type: 'true-false',
         options: ['True', 'False'],
         correctAnswer: 0,
-        explanation: 'React components must return a single parent element or use fragments.',
+        explanation: 'Database normalization is the process of organizing data to reduce redundancy and improve data integrity.',
         points: 25
+      }
+    ]
+  },
+  {
+    id: '4',
+    title: 'Web Security Fundamentals',
+    description: 'Test your understanding of web security concepts, common vulnerabilities, and best practices.',
+    category: 'Security',
+    difficulty: 'intermediate',
+    timeLimit: 1500, // 25 minutes
+    passingScore: 75,
+    points: 175,
+    createdBy: 'admin',
+    createdAt: '2024-02-01',
+    attempts: 98,
+    averageScore: 71,
+    isActive: true,
+    questions: [
+      {
+        id: '11',
+        question: 'What does XSS stand for?',
+        type: 'multiple-choice',
+        options: ['Cross-Site Scripting', 'XML Security Standard', 'eXtended Security System', 'Cross-Server Synchronization'],
+        correctAnswer: 0,
+        explanation: 'XSS stands for Cross-Site Scripting, a common web security vulnerability.',
+        points: 20
+      },
+      {
+        id: '12',
+        question: 'HTTPS encrypts data transmission between client and server.',
+        type: 'true-false',
+        options: ['True', 'False'],
+        correctAnswer: 0,
+        explanation: 'HTTPS uses SSL/TLS encryption to secure data transmission between client and server.',
+        points: 20
       }
     ]
   }
@@ -118,10 +182,10 @@ export const mockQuizzes: Quiz[] = [
 export const mockBadges: Badge[] = [
   {
     id: '1',
-    name: 'First Steps',
-    description: 'Complete your first module',
+    name: 'First Quiz',
+    description: 'Complete your first quiz',
     icon: '🌟',
-    criteria: 'Complete 1 module',
+    criteria: 'Complete 1 quiz',
     rarity: 'common'
   },
   {
@@ -135,18 +199,34 @@ export const mockBadges: Badge[] = [
   {
     id: '3',
     name: 'Knowledge Seeker',
-    description: 'Complete 10 modules',
+    description: 'Complete 10 quizzes',
     icon: '📚',
-    criteria: 'Complete 10 modules',
+    criteria: 'Complete 10 quizzes',
     rarity: 'epic'
   },
   {
     id: '4',
-    name: 'React Expert',
-    description: 'Master React fundamentals',
-    icon: '⚛️',
-    criteria: 'Complete React course with 90%+ average',
+    name: 'Programming Expert',
+    description: 'Excel in programming quizzes',
+    icon: '💻',
+    criteria: 'Score 90%+ on 3 programming quizzes',
     rarity: 'legendary'
+  },
+  {
+    id: '5',
+    name: 'Speed Demon',
+    description: 'Complete a quiz in record time',
+    icon: '⚡',
+    criteria: 'Complete quiz in under 50% of time limit',
+    rarity: 'rare'
+  },
+  {
+    id: '6',
+    name: 'Perfectionist',
+    description: 'Achieve perfect scores',
+    icon: '💎',
+    criteria: 'Score 100% on any quiz',
+    rarity: 'epic'
   }
 ];
 
@@ -162,13 +242,13 @@ export const mockLeaderboard: LeaderboardEntry[] = [
       points: 2450,
       level: 8,
       badges: [],
-      progress: {},
-      completedCourses: [],
+      completedQuizzes: ['1', '2', '3'],
       joinedDate: '2024-01-15'
     },
     points: 2450,
     level: 8,
-    badges: 12
+    badges: 12,
+    quizzesCompleted: 15
   },
   {
     rank: 2,
@@ -181,13 +261,13 @@ export const mockLeaderboard: LeaderboardEntry[] = [
       points: 2180,
       level: 7,
       badges: [],
-      progress: {},
-      completedCourses: [],
+      completedQuizzes: ['1', '2'],
       joinedDate: '2024-01-20'
     },
     points: 2180,
     level: 7,
-    badges: 9
+    badges: 9,
+    quizzesCompleted: 12
   },
   {
     rank: 3,
@@ -200,12 +280,62 @@ export const mockLeaderboard: LeaderboardEntry[] = [
       points: 1950,
       level: 6,
       badges: [],
-      progress: {},
-      completedCourses: [],
+      completedQuizzes: ['1'],
       joinedDate: '2024-02-01'
     },
     points: 1950,
     level: 6,
-    badges: 8
+    badges: 8,
+    quizzesCompleted: 10
+  },
+  {
+    rank: 4,
+    user: {
+      id: '4',
+      name: 'David Wilson',
+      email: 'david@example.com',
+      role: 'student',
+      avatar: 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=400',
+      points: 1720,
+      level: 5,
+      badges: [],
+      completedQuizzes: ['1', '4'],
+      joinedDate: '2024-02-05'
+    },
+    points: 1720,
+    level: 5,
+    badges: 6,
+    quizzesCompleted: 8
+  },
+  {
+    rank: 5,
+    user: {
+      id: '5',
+      name: 'Emma Brown',
+      email: 'emma@example.com',
+      role: 'student',
+      avatar: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=400',
+      points: 1580,
+      level: 5,
+      badges: [],
+      completedQuizzes: ['1', '2'],
+      joinedDate: '2024-02-10'
+    },
+    points: 1580,
+    level: 5,
+    badges: 5,
+    quizzesCompleted: 7
+  }
+];
+
+export const mockQuizAttempts: QuizAttempt[] = [
+  {
+    id: '1',
+    quizId: '1',
+    userId: '1',
+    score: 85,
+    answers: { '1': 0, '2': 0, '3': 2, '4': 2, '5': 0 },
+    completedAt: '2024-02-15T10:30:00Z',
+    timeSpent: 720
   }
 ];

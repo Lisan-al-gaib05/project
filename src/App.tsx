@@ -4,39 +4,37 @@ import LoginForm from './components/Auth/LoginForm';
 import RegisterForm from './components/Auth/RegisterForm';
 import Navbar from './components/Layout/Navbar';
 import Dashboard from './components/Dashboard/Dashboard';
-import CourseList from './components/Courses/CourseList';
-import CourseDetail from './components/Courses/CourseDetail';
+import QuizList from './components/Quiz/QuizList';
+import QuizDetail from './components/Quiz/QuizDetail';
 import QuizInterface from './components/Quiz/QuizInterface';
 import Leaderboard from './components/Leaderboard/Leaderboard';
 import Profile from './components/Profile/Profile';
 import AdminPanel from './components/Admin/AdminPanel';
-import { Course, Module } from './types';
+import { Quiz } from './types';
 
 const AppContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [currentPage, setCurrentPage] = useState('dashboard');
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const [selectedModule, setSelectedModule] = useState<Module | null>(null);
+  const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
 
-  const handleCourseSelect = (course: Course) => {
-    setSelectedCourse(course);
-    setCurrentPage('course-detail');
+  const handleQuizSelect = (quiz: Quiz) => {
+    setSelectedQuiz(quiz);
+    setCurrentPage('quiz-detail');
   };
 
-  const handleModuleSelect = (module: Module) => {
-    setSelectedModule(module);
-    setCurrentPage('quiz');
+  const handleStartQuiz = (quiz: Quiz) => {
+    setSelectedQuiz(quiz);
+    setCurrentPage('quiz-interface');
   };
 
-  const handleBackToCourses = () => {
-    setSelectedCourse(null);
-    setCurrentPage('courses');
+  const handleBackToQuizzes = () => {
+    setSelectedQuiz(null);
+    setCurrentPage('quizzes');
   };
 
-  const handleBackToCourseDetail = () => {
-    setSelectedModule(null);
-    setCurrentPage('course-detail');
+  const handleBackToQuizDetail = () => {
+    setCurrentPage('quiz-detail');
   };
 
   if (!isAuthenticated) {
@@ -51,21 +49,21 @@ const AppContent: React.FC = () => {
     switch (currentPage) {
       case 'dashboard':
         return <Dashboard onPageChange={setCurrentPage} />;
-      case 'courses':
-        return <CourseList onCourseSelect={handleCourseSelect} />;
-      case 'course-detail':
-        return selectedCourse ? (
-          <CourseDetail
-            course={selectedCourse}
-            onBack={handleBackToCourses}
-            onModuleSelect={handleModuleSelect}
+      case 'quizzes':
+        return <QuizList onQuizSelect={handleQuizSelect} />;
+      case 'quiz-detail':
+        return selectedQuiz ? (
+          <QuizDetail
+            quiz={selectedQuiz}
+            onBack={handleBackToQuizzes}
+            onStartQuiz={handleStartQuiz}
           />
         ) : null;
-      case 'quiz':
-        return selectedModule ? (
+      case 'quiz-interface':
+        return selectedQuiz ? (
           <QuizInterface
-            module={selectedModule}
-            onBack={handleBackToCourseDetail}
+            quiz={selectedQuiz}
+            onBack={handleBackToQuizDetail}
           />
         ) : null;
       case 'leaderboard':

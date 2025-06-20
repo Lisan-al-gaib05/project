@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { mockLeaderboard } from '../../data/mockData';
-import { Trophy, Medal, Award, Crown, TrendingUp, Users } from 'lucide-react';
+import { Trophy, Medal, Award, Crown, TrendingUp, Users, Brain } from 'lucide-react';
 
 const Leaderboard: React.FC = () => {
   const [timeFrame, setTimeFrame] = useState<'week' | 'month' | 'all'>('week');
@@ -36,7 +36,7 @@ const Leaderboard: React.FC = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Leaderboard</h1>
         <p className="text-gray-600">
-          See how you rank against other learners in the EduPlay community.
+          See how you rank against other quiz masters in the QuizMaster community.
         </p>
       </div>
 
@@ -55,7 +55,7 @@ const Leaderboard: React.FC = () => {
                 onClick={() => setTimeFrame(period)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
                   timeFrame === period
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-purple-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -109,7 +109,11 @@ const Leaderboard: React.FC = () => {
                   Level {entry.level}
                 </div>
                 <div className="flex items-center justify-center text-sm text-gray-600">
-                  <Award className="w-4 h-4 mr-1 text-purple-500" />
+                  <Brain className="w-4 h-4 mr-1 text-purple-500" />
+                  {entry.quizzesCompleted} quizzes
+                </div>
+                <div className="flex items-center justify-center text-sm text-gray-600">
+                  <Award className="w-4 h-4 mr-1 text-green-500" />
                   {entry.badges} badges
                 </div>
               </div>
@@ -127,7 +131,7 @@ const Leaderboard: React.FC = () => {
               All Rankings
             </h3>
             <span className="text-sm text-gray-600">
-              {mockLeaderboard.length} learners
+              {mockLeaderboard.length} quiz masters
             </span>
           </div>
         </div>
@@ -137,7 +141,7 @@ const Leaderboard: React.FC = () => {
             <div
               key={entry.user.id}
               className={`p-6 hover:bg-gray-50 transition-colors duration-200 ${
-                entry.rank <= 3 ? 'bg-gradient-to-r from-blue-50 to-purple-50' : ''
+                entry.rank <= 3 ? 'bg-gradient-to-r from-purple-50 to-blue-50' : ''
               }`}
             >
               <div className="flex items-center justify-between">
@@ -183,6 +187,14 @@ const Leaderboard: React.FC = () => {
                   
                   <div className="text-center">
                     <div className="flex items-center text-purple-600 mb-1">
+                      <Brain className="w-4 h-4 mr-1" />
+                      <span className="font-semibold">{entry.quizzesCompleted}</span>
+                    </div>
+                    <p className="text-xs text-gray-500">Quizzes</p>
+                  </div>
+                  
+                  <div className="text-center">
+                    <div className="flex items-center text-green-600 mb-1">
                       <Award className="w-4 h-4 mr-1" />
                       <span className="font-semibold">{entry.badges}</span>
                     </div>
@@ -196,25 +208,25 @@ const Leaderboard: React.FC = () => {
       </div>
 
       {/* Achievement Callout */}
-      <div className="mt-8 card p-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <div className="mt-8 card p-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
         <div className="text-center">
           <Trophy className="w-12 h-12 mx-auto mb-4 text-yellow-300" />
           <h3 className="text-xl font-semibold mb-2">Climb the Leaderboard!</h3>
-          <p className="text-blue-100 mb-4">
-            Complete courses, earn points, and unlock badges to improve your ranking.
+          <p className="text-purple-100 mb-4">
+            Complete quizzes, earn points, and unlock badges to improve your ranking.
           </p>
           <div className="flex justify-center space-x-4 text-sm">
             <div className="text-center">
               <div className="text-2xl font-bold text-yellow-300">+100</div>
-              <div className="text-blue-100">Points per quiz</div>
+              <div className="text-purple-100">Points per quiz</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-300">+250</div>
-              <div className="text-blue-100">Points per course</div>
+              <div className="text-2xl font-bold text-yellow-300">+50</div>
+              <div className="text-purple-100">Bonus for perfect score</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-yellow-300">+500</div>
-              <div className="text-blue-100">Points per badge</div>
+              <div className="text-purple-100">Points per badge</div>
             </div>
           </div>
         </div>

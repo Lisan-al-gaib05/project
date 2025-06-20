@@ -30,8 +30,7 @@ const mockUsers: User[] = [
     points: 2450,
     level: 8,
     badges: [],
-    progress: {},
-    completedCourses: ['1', '2'],
+    completedQuizzes: ['1', '2', '3'],
     joinedDate: '2024-01-15'
   },
   {
@@ -43,8 +42,7 @@ const mockUsers: User[] = [
     points: 0,
     level: 1,
     badges: [],
-    progress: {},
-    completedCourses: [],
+    completedQuizzes: [],
     joinedDate: '2024-01-01'
   }
 ];
@@ -83,8 +81,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       points: 0,
       level: 1,
       badges: [],
-      progress: {},
-      completedCourses: [],
+      completedQuizzes: [],
       joinedDate: new Date().toISOString()
     };
     

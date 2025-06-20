@@ -1,13 +1,14 @@
 import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { 
-  BookOpen, 
+  Brain, 
   Trophy, 
   User, 
   LogOut, 
   Bell,
   Menu,
-  X
+  X,
+  Settings
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -20,14 +21,14 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: BookOpen },
-    { id: 'courses', label: 'Courses', icon: BookOpen },
+    { id: 'dashboard', label: 'Dashboard', icon: Brain },
+    { id: 'quizzes', label: 'Quizzes', icon: Brain },
     { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
     { id: 'profile', label: 'Profile', icon: User },
   ];
 
   if (user?.role === 'admin') {
-    navItems.push({ id: 'admin', label: 'Admin', icon: User });
+    navItems.push({ id: 'admin', label: 'Admin', icon: Settings });
   }
 
   return (
@@ -37,11 +38,11 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange }) => {
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-white" />
+              <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
+                <Brain className="w-5 h-5 text-white" />
               </div>
-              <h1 className="ml-3 text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                EduPlay
+              <h1 className="ml-3 text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                QuizMaster
               </h1>
             </div>
           </div>
@@ -57,7 +58,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange }) => {
                     onClick={() => onPageChange(item.id)}
                     className={`px-3 py-2 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors duration-200 ${
                       currentPage === item.id
-                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                        ? 'bg-purple-50 text-purple-700 border border-purple-200'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
                   >
@@ -78,7 +79,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange }) => {
               </button>
 
               {/* User Points */}
-              <div className="flex items-center space-x-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+              <div className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                 <Trophy className="w-4 h-4" />
                 <span>{user?.points || 0}</span>
               </div>
@@ -139,7 +140,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, onPageChange }) => {
                     }}
                     className={`w-full text-left px-3 py-2 rounded-md text-base font-medium flex items-center space-x-2 ${
                       currentPage === item.id
-                        ? 'bg-blue-50 text-blue-700'
+                        ? 'bg-purple-50 text-purple-700'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                     }`}
                   >

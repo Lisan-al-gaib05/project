@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { mockBadges, mockCourses } from '../../data/mockData';
+import { mockBadges, mockQuizzes } from '../../data/mockData';
 import { 
   User, 
   Trophy, 
   Award, 
-  BookOpen, 
+  Brain, 
   Calendar,
   Target,
   TrendingUp,
   Star,
   Edit,
   Mail,
-  MapPin
+  CheckCircle
 } from 'lucide-react';
 
 const Profile: React.FC = () => {
@@ -23,17 +23,17 @@ const Profile: React.FC = () => {
     email: user?.email || ''
   });
 
-  const completedCourses = mockCourses.filter(course => 
-    user?.completedCourses.includes(course.id)
+  const completedQuizzes = mockQuizzes.filter(quiz => 
+    user?.completedQuizzes.includes(quiz.id)
   );
 
-  const earnedBadges = mockBadges.slice(0, 8); // Mock earned badges
+  const earnedBadges = mockBadges.slice(0, 6); // Mock earned badges
 
   const stats = [
     { label: 'Total Points', value: user?.points || 0, icon: Trophy, color: 'text-yellow-600' },
     { label: 'Level', value: user?.level || 1, icon: Target, color: 'text-blue-600' },
     { label: 'Badges Earned', value: earnedBadges.length, icon: Award, color: 'text-purple-600' },
-    { label: 'Courses Completed', value: completedCourses.length, icon: BookOpen, color: 'text-green-600' }
+    { label: 'Quizzes Completed', value: completedQuizzes.length, icon: Brain, color: 'text-green-600' }
   ];
 
   const handleSaveProfile = () => {
@@ -65,6 +65,15 @@ const Profile: React.FC = () => {
     return Math.min((progressPoints / levelRange) * 100, 100);
   };
 
+  const getDifficultyColor = (difficulty: string) => {
+    const colors = {
+      beginner: 'bg-green-100 text-green-800',
+      intermediate: 'bg-yellow-100 text-yellow-800',
+      advanced: 'bg-red-100 text-red-800'
+    };
+    return colors[difficulty as keyof typeof colors] || colors.beginner;
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -80,7 +89,7 @@ const Profile: React.FC = () => {
                     className="w-24 h-24 rounded-full object-cover mx-auto"
                   />
                 ) : (
-                  <div className="w-24 h-24 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto">
+                  <div className="w-24 h-24 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center mx-auto">
                     <User className="w-12 h-12 text-white" />
                   </div>
                 )}
@@ -100,14 +109,14 @@ const Profile: React.FC = () => {
                     type="text"
                     value={editForm.name}
                     onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="Full Name"
                   />
                   <input
                     type="email"
                     value={editForm.email}
                     onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="Email"
                   />
                   <div className="flex space-x-2">
@@ -200,7 +209,7 @@ const Profile: React.FC = () => {
               Badges ({earnedBadges.length})
             </h3>
             
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {earnedBadges.map((badge) => (
                 <div
                   key={badge.id}
@@ -208,8 +217,8 @@ const Profile: React.FC = () => {
                 >
                   <div className="text-3xl mb-2">{badge.icon}</div>
                   <h4 className="font-medium text-gray-900 text-sm mb-1">{badge.name}</h4>
-                  <p className="text-xs text-gray-600">{badge.description}</p>
-                  <span className={`inline-block mt-2 px-2 py-1 rounded-full text-xs font-medium ${
+                  <p className="text-xs text-gray-600 mb-2">{badge.description}</p>
+                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
                     badge.rarity === 'legendary' ? 'bg-yellow-200 text-yellow-800' :
                     badge.rarity === 'epic' ? 'bg-purple-200 text-purple-800' :
                     badge.rarity === 'rare' ? 'bg-blue-200 text-blue-800' :
@@ -222,39 +231,44 @@ const Profile: React.FC = () => {
             </div>
           </div>
 
-          {/* Completed Courses */}
+          {/* Completed Quizzes */}
           <div className="card p-6">
             <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-              <BookOpen className="w-5 h-5 mr-2" />
-              Completed Courses ({completedCourses.length})
+              <Brain className="w-5 h-5 mr-2" />
+              Completed Quizzes ({completedQuizzes.length})
             </h3>
             
             <div className="space-y-4">
-              {completedCourses.map((course) => (
-                <div key={course.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-200">
-                  <div className="flex items-start space-x-4">
-                    <img
-                      src={course.image}
-                      alt={course.title}
-                      className="w-16 h-16 rounded-lg object-cover"
-                    />
+              {completedQuizzes.map((quiz) => (
+                <div key={quiz.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-200">
+                  <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-lg font-medium text-gray-900 mb-1">{course.title}</h4>
-                      <p className="text-sm text-gray-600 mb-2">{course.category}</p>
+                      <div className="flex items-center space-x-2 mb-2">
+                        <h4 className="text-lg font-medium text-gray-900">{quiz.title}</h4>
+                        <span className={`badge ${getDifficultyColor(quiz.difficulty)}`}>
+                          {quiz.difficulty}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">{quiz.category}</p>
                       <div className="flex items-center space-x-4 text-xs text-gray-500">
                         <div className="flex items-center">
-                          <Star className="w-3 h-3 mr-1 text-yellow-400 fill-current" />
-                          {course.rating}
+                          <Brain className="w-3 h-3 mr-1" />
+                          {quiz.questions.length} questions
                         </div>
-                        <div>Completed</div>
+                        <div className="flex items-center">
+                          <Star className="w-3 h-3 mr-1 text-yellow-400 fill-current" />
+                          {quiz.averageScore}% avg
+                        </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium mb-2">
+                      <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium mb-2 flex items-center">
+                        <CheckCircle className="w-3 h-3 mr-1" />
                         Completed
                       </div>
                       <div className="text-sm font-medium text-gray-900">
-                        +{course.modules.reduce((sum, module) => sum + module.points, 0)} pts
+                        +{quiz.points} pts
+                
                       </div>
                     </div>
                   </div>
@@ -262,11 +276,11 @@ const Profile: React.FC = () => {
               ))}
             </div>
 
-            {completedCourses.length === 0 && (
+            {completedQuizzes.length === 0 && (
               <div className="text-center py-8">
-                <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h4 className="text-lg font-medium text-gray-900 mb-2">No completed courses yet</h4>
-                <p className="text-gray-600">Start learning to see your progress here!</p>
+                <Brain className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h4 className="text-lg font-medium text-gray-900 mb-2">No completed quizzes yet</h4>
+                <p className="text-gray-600">Start taking quizzes to see your progress here!</p>
               </div>
             )}
           </div>
