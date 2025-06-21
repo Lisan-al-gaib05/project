@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { mockQuizzes, mockLeaderboard } from '../../data/mockData';
+import React, { useState, useEffect } from 'react';
 import { Quiz, Question } from '../../types';
+import { quizService } from '../../services/quizService';
+import { leaderboardService } from '../../services/leaderboardService';
 import { 
   Users, 
   Brain, 
@@ -19,6 +20,9 @@ const AdminPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'quizzes' | 'users' | 'analytics'>('overview');
   const [showCreateQuiz, setShowCreateQuiz] = useState(false);
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [quizForm, setQuizForm] = useState({
     title: '',
     description: '',
@@ -30,6 +34,26 @@ const AdminPanel: React.FC = () => {
     questions: [] as Question[]
   });
 
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [quizzesData, leaderboardData] = await Promise.all([
+        quizService.getAllQuizzes(),
+        leaderboardService.getLeaderboard()
+      ]);
+      setQuizzes(quizzesData);
+      setLeaderboard(leaderboardData);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const tabs = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'quizzes', label: 'Quizzes', icon: Brain },
@@ -37,10 +61,10 @@ const AdminPanel: React.FC = () => {
     { id: 'analytics', label: 'Analytics', icon: TrendingUp }
   ];
 
-  const totalUsers = mockLeaderboard.length;
-  const totalQuizzes = mockQuizzes.length;
-  const totalAttempts = mockQuizzes.reduce((sum, quiz) => sum + quiz.attempts, 0);
-  const avgScore = Math.round(mockQuizzes.reduce((sum, quiz) => sum + quiz.averageScore, 0) / mockQuizzes.length);
+  const totalUsers = leaderboard.length;
+  const totalQuizzes = quizzes.length;
+  const totalAttempts = quizzes.reduce((sum, quiz) => sum + (quiz.attempts || 0), 0);
+  const avgScore = quizzes.length > 0 ? Math.round(quizzes.reduce((sum, quiz) => sum + (quiz.averageScore || 0), 0) / quizzes.length) : 0;
 
   const stats = [
     { label: 'Total Users', value: totalUsers, icon: Users, color: 'blue', change: '+12%' },
@@ -78,11 +102,30 @@ const AdminPanel: React.FC = () => {
     setShowCreateQuiz(true);
   };
 
-  const handleSaveQuiz = () => {
-    // In a real app, this would save to the backend
-    console.log('Saving quiz:', quizForm);
-    setShowCreateQuiz(false);
-    setEditingQuiz(null);
+  const handleSaveQuiz = async () => {
+    try {
+      if (editingQuiz) {
+        await quizService.updateQuiz(editingQuiz.id, quizForm);
+      } else {
+        await quizService.createQuiz(quizForm);
+      }
+      setShowCreateQuiz(false);
+      setEditingQuiz(null);
+      loadData(); // Reload data
+    } catch (error) {
+      console.error('Error saving quiz:', error);
+    }
+  };
+
+  const handleDeleteQuiz = async (quizId: string) => {
+    if (window.confirm('Are you sure you want to delete this quiz?')) {
+      try {
+        await quizService.deleteQuiz(quizId);
+        loadData(); // Reload data
+      } catch (error) {
+        console.error('Error deleting quiz:', error);
+      }
+    }
   };
 
   const addQuestion = () => {
@@ -117,6 +160,16 @@ const AdminPanel: React.FC = () => {
     }));
   };
 
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        </div>
+      </div>
+    );
+  }
+
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Stats Grid */}
@@ -145,18 +198,18 @@ const AdminPanel: React.FC = () => {
         <div className="card p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Quiz Attempts</h3>
           <div className="space-y-3">
-            {mockLeaderboard.slice(0, 5).map((entry) => (
-              <div key={entry.user.id} className="flex items-center space-x-3">
+            {leaderboard.slice(0, 5).map((entry, index) => (
+              <div key={index} className="flex items-center space-x-3">
                 <img
-                  src={entry.user.avatar}
-                  alt={entry.user.name}
+                  src={entry.user?.avatar || `https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400`}
+                  alt={entry.user?.name || 'User'}
                   className="w-8 h-8 rounded-full object-cover"
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900">{entry.user.name}</p>
-                  <p className="text-xs text-gray-600">Completed JavaScript Fundamentals</p>
+                  <p className="text-sm font-medium text-gray-900">{entry.user?.name || 'Anonymous'}</p>
+                  <p className="text-xs text-gray-600">Completed a quiz</p>
                 </div>
-                <span className="text-xs text-gray-500">2h ago</span>
+                <span className="text-xs text-gray-500">Recent</span>
               </div>
             ))}
           </div>
@@ -165,13 +218,13 @@ const AdminPanel: React.FC = () => {
         <div className="card p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Performing Quizzes</h3>
           <div className="space-y-3">
-            {mockQuizzes.slice(0, 5).map((quiz) => (
+            {quizzes.slice(0, 5).map((quiz) => (
               <div key={quiz.id} className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-900">{quiz.title}</p>
-                  <p className="text-xs text-gray-600">{quiz.attempts} attempts</p>
+                  <p className="text-xs text-gray-600">{quiz.attempts || 0} attempts</p>
                 </div>
-                <span className="text-sm font-medium text-gray-900">{quiz.averageScore}%</span>
+                <span className="text-sm font-medium text-gray-900">{quiz.averageScore || 0}%</span>
               </div>
             ))}
           </div>
@@ -216,12 +269,12 @@ const AdminPanel: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {mockQuizzes.map((quiz) => (
+              {quizzes.map((quiz) => (
                 <tr key={quiz.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900">{quiz.title}</div>
-                      <div className="text-sm text-gray-600">{quiz.questions.length} questions</div>
+                      <div className="text-sm text-gray-600">{quiz.questions?.length || 0} questions</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -237,10 +290,10 @@ const AdminPanel: React.FC = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {quiz.attempts.toLocaleString()}
+                    {(quiz.attempts || 0).toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {quiz.averageScore}%
+                    {quiz.averageScore || 0}%
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
@@ -253,7 +306,10 @@ const AdminPanel: React.FC = () => {
                       >
                         <Edit className="w-4 h-4" />
                       </button>
-                      <button className="text-red-600 hover:text-red-900">
+                      <button 
+                        onClick={() => handleDeleteQuiz(quiz.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -299,36 +355,36 @@ const AdminPanel: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {mockLeaderboard.map((entry) => (
-                <tr key={entry.user.id} className="hover:bg-gray-50">
+              {leaderboard.map((entry, index) => (
+                <tr key={index} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <img
-                        src={entry.user.avatar}
-                        alt={entry.user.name}
+                        src={entry.user?.avatar || `https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400`}
+                        alt={entry.user?.name || 'User'}
                         className="w-10 h-10 rounded-full object-cover"
                       />
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{entry.user.name}</div>
-                        <div className="text-sm text-gray-600">{entry.user.email}</div>
+                        <div className="text-sm font-medium text-gray-900">{entry.user?.name || 'Anonymous'}</div>
+                        <div className="text-sm text-gray-600">{entry.user?.email || 'No email'}</div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`badge ${
-                      entry.user.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                      entry.user?.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
                     }`}>
-                      {entry.user.role}
+                      {entry.user?.role || 'student'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {entry.points.toLocaleString()}
+                    {(entry.points || 0).toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {entry.quizzesCompleted}
+                    {entry.quizzesCompleted || 0}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(entry.user.joinedDate).toLocaleDateString()}
+                    {entry.user?.joinedDate ? new Date(entry.user.joinedDate).toLocaleDateString() : 'Unknown'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
