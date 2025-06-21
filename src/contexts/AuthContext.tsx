@@ -1,13 +1,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '../types';
+import { authService } from '../services/authService';
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (userData: Partial<User> & { password: string }) => Promise<boolean>;
-  logout: () => void;
-  updateUser: (userData: Partial<User>) => void;
+  register: (userData: { name: string; email: string; password: string }) => Promise<boolean>;
+  logout: () => Promise<void>;
+  updateUser: (userData: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,88 +22,60 @@ export const useAuth = () => {
   return context;
 };
 
-const mockUsers: User[] = [
-  {
-    id: '1',
-    name: 'Alice Johnson',
-    email: 'alice@example.com',
-    role: 'student',
-    avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400',
-    points: 2450,
-    level: 8,
-    badges: [],
-    completedQuizzes: ['1', '2', '3'],
-    joinedDate: '2024-01-15'
-  },
-  {
-    id: '2',
-    name: 'Dr. Smith',
-    email: 'admin@example.com',
-    role: 'admin',
-    avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400',
-    points: 0,
-    level: 1,
-    badges: [],
-    completedQuizzes: [],
-    joinedDate: '2024-01-01'
-  }
-];
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('eduplay_user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-      setIsAuthenticated(true);
-    }
+    // Set up auth state listener
+    const { data: { subscription } } = authService.onAuthStateChange((user) => {
+      setUser(user);
+      setIsAuthenticated(!!user);
+      setIsLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Mock authentication
-    const foundUser = mockUsers.find(u => u.email === email && password === 'password');
-    if (foundUser) {
-      setUser(foundUser);
-      setIsAuthenticated(true);
-      localStorage.setItem('eduplay_user', JSON.stringify(foundUser));
+    try {
+      await authService.signIn(email, password);
       return true;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
     }
-    return false;
   };
 
-  const register = async (userData: Partial<User> & { password: string }): Promise<boolean> => {
-    // Mock registration
-    const newUser: User = {
-      id: Date.now().toString(),
-      name: userData.name || '',
-      email: userData.email || '',
-      role: 'student',
-      points: 0,
-      level: 1,
-      badges: [],
-      completedQuizzes: [],
-      joinedDate: new Date().toISOString()
-    };
+  const register = async (userData: { name: string; email: string; password: string }): Promise<boolean> => {
+    try {
+      await authService.signUp(userData.email, userData.password, userData.name);
+      return true;
+    } catch (error) {
+      console.error('Registration error:', error);
+      return false;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await authService.signOut();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  const updateUser = async (userData: Partial<User>) => {
+    if (!user) return;
     
-    setUser(newUser);
-    setIsAuthenticated(true);
-    localStorage.setItem('eduplay_user', JSON.stringify(newUser));
-    return true;
-  };
-
-  const logout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('eduplay_user');
-  };
-
-  const updateUser = (userData: Partial<User>) => {
-    if (user) {
-      const updatedUser = { ...user, ...userData };
+    try {
+      const updatedUser = await authService.updateProfile(user.id, userData);
       setUser(updatedUser);
-      localStorage.setItem('eduplay_user', JSON.stringify(updatedUser));
+    } catch (error) {
+      console.error('Update user error:', error);
     }
   };
 
@@ -109,6 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider value={{
       user,
       isAuthenticated,
+      isLoading,
       login,
       register,
       logout,

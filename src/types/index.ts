@@ -6,9 +6,9 @@ export interface User {
   avatar?: string;
   points: number;
   level: number;
-  badges: Badge[];
-  completedQuizzes: string[];
-  joinedDate: string;
+  completed_quizzes: string[];
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Quiz {
@@ -18,34 +18,38 @@ export interface Quiz {
   category: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   questions: Question[];
-  timeLimit: number;
-  passingScore: number;
+  time_limit: number;
+  passing_score: number;
   points: number;
-  createdBy: string;
-  createdAt: string;
+  created_by: string;
+  is_active: boolean;
   attempts: number;
-  averageScore: number;
-  isActive: boolean;
+  average_score: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Question {
   id: string;
+  quiz_id: string;
   question: string;
   type: 'multiple-choice' | 'true-false';
   options?: string[];
-  correctAnswer: string | number;
+  correct_answer: number;
   explanation: string;
   points: number;
+  order_index: number;
+  created_at: string;
 }
 
 export interface QuizAttempt {
   id: string;
-  quizId: string;
-  userId: string;
+  quiz_id: string;
+  user_id: string;
   score: number;
   answers: Record<string, string | number>;
-  completedAt: string;
-  timeSpent: number;
+  time_spent: number;
+  completed_at: string;
 }
 
 export interface Badge {
@@ -55,7 +59,15 @@ export interface Badge {
   icon: string;
   criteria: string;
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
-  unlockedAt?: string;
+  created_at: string;
+}
+
+export interface UserBadge {
+  id: string;
+  user_id: string;
+  badge_id: string;
+  earned_at: string;
+  badge: Badge;
 }
 
 export interface LeaderboardEntry {
@@ -64,5 +76,5 @@ export interface LeaderboardEntry {
   points: number;
   level: number;
   badges: number;
-  quizzesCompleted: number;
+  quizzes_completed: number;
 }
